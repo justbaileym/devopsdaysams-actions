@@ -25,3 +25,17 @@ jobs:
     # Runs a single command using the runners shell
     - name: Run a one-line script
       run: echo "github.com/${GITHUB_REPOSITORY}"
+
+    - name: Build Docker image
+      run: |
+        export TAG=${GITHUB_SHA:0:8}
+        docker build
+    - name: Push Docker image
+      run: |
+        export TAG=${GITHUB_SHA:0:8}
+        echo "$DOCKER_PASSWORD" | docker login docker.pkg.github.com -u "$DOCKER_USERNAME" --password-stdin
+        docker push
+      if: github.ref == 'refs/heads/main'
+      env:
+        DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+        DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}
